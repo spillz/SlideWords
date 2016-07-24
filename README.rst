@@ -1,4 +1,4 @@
-.. image:: screenshots/splash.png
+.. image:: resources/splash.png
    :align: center
 
 SlideWords 0.3.2
