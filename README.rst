@@ -4,6 +4,7 @@
 SlideWords 0.3.2
 ================
 
+A challenging word search game for 1 or 2 players.
 
 Building for Android
 ====================
@@ -35,9 +36,9 @@ Also copy from google extras Android Support::
 To build for the google play store
 ----------------------------------
 
-(NOTE: may need to install jarsigner first)
+(NOTE: You may need to install jarsigner as well)
 
-One-time to make sure the google play service ID's are read into the app (the destination folder won't exist until you do a buildozer android [debug/release]::
+Before you will be able to make a successful build make sure the google play service ID's are read into the app (the destination folder won't exist until you have run "buildozer android [debug/release]" at least one time)::
 
     rsync -rav ./google_play_ids.xml .buildozer/android/platform/python-for-android/dist/slidewords/res/values/
 
@@ -47,10 +48,11 @@ Then run::
     jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/SlideWordsKey.keystore bin/SlideWords-0.3.2-release-unsigned.apk slidewords
     ~/.buildozer/android/platform/android-sdk-20/tools/zipalign -v 4 bin/SlideWords-0.3.2-release-unsigned.apk bin/SlideWords-0.3.2-release.apk
 
-Alternatively, the script will do the 3 steps above for you and deploy to the device (assuming its plugged in with developer mode enabled)::
-
-    test_android_release
-
-To generate a new key (current key is already in the repo)::
+To generate a new key::
 
     keytool -genkey -v -keystore SlideWordsKey.keystore -alias slidewords -keyalg RSA -keysize 2048 -validity 10000
+
+Alternatively, this script will sign and align the APK for you and then deploy it to the device (assuming it is plugged in with developer mode enabled)::
+
+    ./test_android_release
+
