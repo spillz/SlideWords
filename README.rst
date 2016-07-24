@@ -42,17 +42,19 @@ Before you will be able to make a successful build make sure the google play ser
 
     rsync -rav ./google_play_ids.xml .buildozer/android/platform/python-for-android/dist/slidewords/res/values/
 
-Then run::
+To generate a new key (you only need to do this once)::
+
+    keytool -genkey -v -keystore SlideWordsKey.keystore -alias slidewords -keyalg RSA -keysize 2048 -validity 10000
+
+Then run the following three commands to build, sign and zip align the APK::
 
     buildozer android release
     jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/SlideWordsKey.keystore bin/SlideWords-0.3.2-release-unsigned.apk slidewords
     ~/.buildozer/android/platform/android-sdk-20/tools/zipalign -v 4 bin/SlideWords-0.3.2-release-unsigned.apk bin/SlideWords-0.3.2-release.apk
 
-To generate a new key::
+Obviously, the game already has its own store entry so you will have to create your own to submit a modified version to the store.
 
-    keytool -genkey -v -keystore SlideWordsKey.keystore -alias slidewords -keyalg RSA -keysize 2048 -validity 10000
-
-Alternatively, this script will sign and align the APK for you and then deploy it to the device (assuming it is plugged in with developer mode enabled)::
+For testing, this script will sign and align the APK for you and then deploy it to the device (assuming it is plugged in with developer mode enabled)::
 
     ./test_android_release
 
