@@ -1,0 +1,6 @@
+#buildozer android release
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore SlideWordsKey.keystore bin/SlideWords-0.3.2-release-unsigned.apk slidewords
+rm bin/SlideWords-0.3.2-release.apk 
+~/.buildozer/android/platform/android-sdk-20/tools/zipalign -v 4 bin/SlideWords-0.3.2-release-unsigned.apk bin/SlideWords-0.3.2-release.apk
+~/.buildozer/android/platform/android-sdk-20/platform-tools/adb install -r bin/SlideWords-0.3.2-release.apk
+~/.buildozer/android/platform/android-sdk-20/platform-tools/adb logcat |grep python

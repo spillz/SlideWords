@@ -1,0 +1,18 @@
+<resources>  
+  <string name="app_id">425229314950</string>
+  <string name="high_score">CgkIhteRjbAMEAIQAA</string>
+  <string name="daily_challenge_high_score">CgkIhteRjbAMEAIQAg</string>
+  <string name="number_1000_plus_games">CgkIhteRjbAMEAIQEA</string>
+  <string name="achievement_3_letter_word">CgkIhteRjbAMEAIQAw</string>
+  <string name="achievement_4_letter_word">CgkIhteRjbAMEAIQBA</string>
+  <string name="achievement_5_letter_word">CgkIhteRjbAMEAIQBQ</string>
+  <string name="achievement_6_letter_word">CgkIhteRjbAMEAIQBg</string>
+  <string name="achievement_7_letter_word">CgkIhteRjbAMEAIQBw</string>
+  <string name="achievement_8_letter_word">CgkIhteRjbAMEAIQCA</string>
+  <string name="achievement_9_letter_word">CgkIhteRjbAMEAIQCQ</string>
+  <string name="achievement_10_letter_word">CgkIhteRjbAMEAIQCg</string>
+  <string name="achievement_score_of_600">CgkIhteRjbAMEAIQCw</string>
+  <string name="achievement_score_of_800">CgkIhteRjbAMEAIQDA</string>
+  <string name="achievement_score_of_1000">CgkIhteRjbAMEAIQDQ</string>
+  <string name="achievement_score_of_1200">CgkIhteRjbAMEAIQDg</string>
+</resources>  
