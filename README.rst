@@ -1,7 +1,7 @@
 .. image:: resources/slidewords-feature.png
    :align: center
 
-SlideWords 0.3.2
+SlideWords 0.3.3
 ================
 
 A challenging word search game for 1 or 2 players.
@@ -49,8 +49,8 @@ To generate a new key (you only need to do this once)::
 Then run the following three commands to build, sign and zip align the APK::
 
     buildozer android release
-    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/SlideWordsKey.keystore bin/SlideWords-0.3.2-release-unsigned.apk slidewords
-    ~/.buildozer/android/platform/android-sdk-20/tools/zipalign -v 4 bin/SlideWords-0.3.2-release-unsigned.apk bin/SlideWords-0.3.2-release.apk
+    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/SlideWordsKey.keystore bin/SlideWords-0.3.3-release-unsigned.apk slidewords
+    ~/.buildozer/android/platform/android-sdk-20/tools/zipalign -v 4 bin/SlideWords-0.3.3-release-unsigned.apk bin/SlideWords-0.3.3-release.apk
 
 Obviously, the game already has its own store entry so you will have to create your own to submit a modified version to the store.
 

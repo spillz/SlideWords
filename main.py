@@ -12,7 +12,7 @@ uspac = pytz.timezone("US/Pacific")
 import kivy
 kivy.require('1.8.0')
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 def get_user_path():
     """ Return the folder to where user data can be stored """
@@ -38,7 +38,7 @@ from kivy.uix.label import Label
 from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty, ReferenceListProperty, NumericProperty, \
     BooleanProperty, ListProperty, ObjectProperty, DictProperty
-from kivy.uix.image import Image
+from kivy.uix.image import Image, AsyncImage
 from kivy.graphics.texture import Texture
 from kivy.graphics import Rectangle, Color
 from kivy.clock import Clock
@@ -103,7 +103,7 @@ class Tile(Widget):
 
     def on_touch_down(self, touch):
         if not self.board.active_player.local_touch():
-            return
+            return False
         if self.board.block_gpos_updates:
             return False
         if self.collide_point(*touch.pos):
@@ -119,7 +119,7 @@ class Tile(Widget):
 
     def on_touch_move(self, touch):
         if not self.board.active_player.local_touch():
-            return
+            return False
         if touch.grab_current is self:
             self.pos[0] = touch.pos[0] - self.pos_offset[0]
             self.pos[1] = touch.pos[1] - self.pos_offset[1]
@@ -127,7 +127,7 @@ class Tile(Widget):
 
     def on_touch_up(self, touch):
         if not self.board.active_player.local_touch():
-            return
+            return False
         if touch.grab_current is self:
             gpos = self.board.pos2gpos(touch.pos)
             if gpos in self.candidates:
@@ -138,7 +138,8 @@ class Tile(Widget):
             touch.ungrab(self)
             self.board.draw_background()
             return True
-
+        return False
+            
 class Board(FloatLayout):
     game_over = BooleanProperty()
     def __init__(self,**kwargs):
@@ -174,6 +175,9 @@ class Board(FloatLayout):
         self.active_player = self.players[1]
         self.game_over = False
         self.consecutive_passes = 0
+        self.score1000 = Score1000(self.scorebar)
+        self.add_widget(self.score1000)
+        self.score1000.bind(on_touch_down = self.on_touch_score1000)
 
         tile_set = []
         for t in tiles:
@@ -426,6 +430,7 @@ class Board(FloatLayout):
         self.score_detail_1p.pos = self.pos
         self.score_detail_2p.size = self.size
         self.score_detail_2p.pos = self.pos
+        Clock.schedule_once(lambda *args: self.score1000.resize(self.scorebar), 0.01)
         self.draw_background()
         if self.first_start:
             self.first_start = False
@@ -463,7 +468,7 @@ class Board(FloatLayout):
         self.wordbar.word, self.wordbar.word_score = self.is_selection_a_word()
 
     def update_pass_bar(self, *args):
-        self.wordbar.can_pass = self.selection == [] and self.active_player.local_touch()
+        self.wordbar.can_pass = self.selection == [] and self.active_player.local_touch() and self.scorebar.players == 2
 
     def reset_selected(self):
         # this has a bug if user moves more than one tile
@@ -587,9 +592,10 @@ class Board(FloatLayout):
             self.scorebar.score += self.wordbar.word_score
         else:
             self.scorebar.score_2 += self.wordbar.word_score
-        if platform == 'android' and self.scorebar.players == 1 and score<1000<=self.scorebar.score and self.scorebar.score>=1000:
-            App.get_running_app().gs_get_score(leaderboard_1000_games)
-            if self.score_bar.score > self.scorebar.hi_score:
+        if platform == 'android' and self.scorebar.players == 1:
+            if score<1000<=self.scorebar.score and self.scorebar.score>=1000:
+                App.get_running_app().gs_get_score(leaderboard_1000_games)
+            if self.scorebar.score > self.scorebar.hi_score >= score:
                 if self.game_id != 'default':
                     App.get_running_app().gs_score(leaderboard_daily_challenge_highscore, int(self.score))
                 App.get_running_app().gs_score(leaderboard_highscore, int(self.score))
@@ -624,7 +630,18 @@ class Board(FloatLayout):
     def on_touch_score(self, scorebar, touch):
         if self.scorebar.collide_point(*touch.pos):
             self.show_score_summary()
-        return True
+            return True
+        return False
+                
+    def on_touch_score1000(self, score1000, touch):
+        if self.overlay_showing():
+            return False
+        if self.score1000.collide_point(*touch.pos):
+            if platform == 'android':
+                score_type = leaderboard_1000_games
+                App.get_running_app().gs_show_leaderboard(score_type)
+            return True
+        return False
                 
     def show_score_summary(self):
         if self.overlay_showing():
@@ -929,7 +946,54 @@ class ScoreBar(BoxLayout):
                 App.get_running_app().gs_achieve('achievement_score_of_1000')
             if self.score > 1200:
                 App.get_running_app().gs_achieve('achievement_score_of_1200')
-                
+                                    
+class Score1000(Image):
+    def __init__(self, scorebar):
+        super(Score1000, self).__init__(size_hint = [None, None],
+            source = "img/achievement_score_1000_24.png", allow_stretch = True, keep_ratio = False, size = (24,24))
+        self.triggered = False
+        self.sized = False
+        scorebar.bind(score = self.on_score)
+    def on_score(self, scorebar, score):
+        if not self.sized:
+            return
+        if scorebar.players == 1 and scorebar.score >= 1000:
+            self.right = scorebar.right
+            self.y = 0
+            if self.triggered == False:
+                s = 1.2
+                a = Animation(center_y = self.center_y, center_x = self.center_x, size = (self.size[0]*s, self.size[1]*s), duration = 0.1) \
+                    + Animation(center_y = self.center_y, center_x = self.center_x, size = (self.size[0], self.size[1]), duration = 0.1) \
+                    + Animation(center_y = self.center_y, center_x = self.center_x, size = (self.size[0]*s, self.size[1]*s), duration = 0.1) \
+                    + Animation(center_y = self.center_y, center_x = self.center_x, size = (self.size[0], self.size[1]), duration = 0.1) 
+                Clock.schedule_once(lambda *args: a.start(self), 0.5)
+            self.triggered = True
+        else:
+            self.center_x = scorebar.center_x
+            self.y = scorebar.top
+            self.triggered = False
+    def resize(self, scorebar):
+        h = scorebar.size[1]*0.66
+        if h>128:
+            h=128
+        elif h>64:
+            h=64
+        elif h>48:
+            h=48
+        else:
+            h=24
+        self.size = (h, h)
+        self.source = "img/achievement_score_1000_%i.png"%h
+        if scorebar.score >= 1000 or self.triggered:
+            self.right = scorebar.right
+            self.y = 0
+            self.triggered = True
+        else:
+            self.center_x = scorebar.center_x
+            self.y = scorebar.top
+        self.sized = True
+            
+            
 class WordBar(BoxLayout):
     w_word_label = ObjectProperty()
     word = StringProperty()

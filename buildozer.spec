@@ -13,7 +13,7 @@ package.domain = org.picty
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,kv,pck
+source.include_exts = py,kv,pck,png
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec,pyc,pickle,json
